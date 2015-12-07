@@ -28,16 +28,16 @@ Usage: ruby pinger.rb [options]
 
 JS script can be executed independently of ruby script:
 
-Usage: phantomjs pinger.js [OPTIONS]
+Usage: phantomjs pinger.js [options]
 
--k, --keyword        keyword as search parameter (google search string)
+     -k, --keyword        keyword as search parameter (google search string)
 
--s, --search         address which should be found in google
+     -s, --search         address which should be found in google
 
--z, --zipcode        used to get fake geolocation and pass it to phantom browser
+     -z, --zipcode        used to get fake geolocation and pass it to phantom browser
 
--t, --timeout        change default request timeout. Default is 2000 (2s)
+     -t, --timeout        change default request timeout. Default is 2000 (2s)
 
--h, --help           show this message
+     -h, --help           show this message
 
 Please note, that all options (exclude help and timeout) are mandatory
