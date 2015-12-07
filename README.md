@@ -8,7 +8,7 @@ Phantomjs 2.0.0 or higher (this is important, because phantomjs 1.9.X does not w
 
 IMPORTANT:
 
-This was only tested on linux 12.10. Work on other platforms may be unstable.
+This was only tested on ubuntu linux 12.10. Work on other platforms may be unstable.
 
 Usage: ruby pinger.rb [options]
 
