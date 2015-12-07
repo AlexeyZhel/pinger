@@ -6,7 +6,7 @@ def get_options
   options = {:timeout => "2000"}
 
   OptionParser.new do |opts|
-    opts.banner = "Usage: pinger.rb [options]"
+    opts.banner = "Usage: ruby pinger.rb [options]"
 
     opts.on("-i", "--input file.csv", "Specifies input csv file.") do |input|
       options[:input] = input
