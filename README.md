@@ -10,6 +10,7 @@ IMPORTANT
 This was only tested on linux 12.10. Work on other platforms may be unstable.
 
 Usage: ruby pinger.rb [options]
+
     -i, --input file.csv             Specifies input csv file.
     
     -o, --output file.csv            Specifies output csv file.
@@ -28,6 +29,7 @@ Usage: ruby pinger.rb [options]
 JS script can be executed independently of ruby script:
 
 Usage: phantomjs pinger.js [OPTIONS]
+
 -k, --keyword        keyword as search parameter (google search string)
 
 -s, --search         address which should be found in google
