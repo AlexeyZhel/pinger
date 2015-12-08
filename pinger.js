@@ -191,21 +191,19 @@ function setFakeCoords(coordsJson, page) {
         lat = coords.lat,
         lng = coords.lng;
 
-    evaluate(page, function () {
-        window.navigator.geolocation = function (latitude, longitude) {
-            var pub = {};
-            var current_pos = {
-                coords: {
-                    latitude: latitude,
-                    longitude: longitude
-                }
-            };
-            pub.getCurrentPosition = function (locationCallback, errorCallback) {
-                locationCallback(current_pos);
-            };
-            return pub;
-        }(arguments[0], arguments[1]);
-    }, lat, lng);
+    window.navigator.geolocation = function (latitude, longitude) {
+        var pub = {};
+        var current_pos = {
+            coords: {
+                latitude: latitude,
+                longitude: longitude
+            }
+        };
+        pub.getCurrentPosition = function (locationCallback, errorCallback) {
+            locationCallback(current_pos);
+        };
+        return pub;
+    }(lat, lng);
 }
 
 
