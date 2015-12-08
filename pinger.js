@@ -1,7 +1,8 @@
 var system = require('system'),
+    webpage = require('webpage'),
     args = system.args,
-    url = 'http://www.google.com/',
-    page = new WebPage(),
+    url = 'http://www.google.com',
+    page = webpage.create(),
     requestTimeOut = 2000,
     searchAddress,
     keyword,
@@ -40,9 +41,9 @@ for (var i = 1; i < args.length; i++) {
     }
 }
 // test func for evaluate
-//page.onConsoleMessage = function (msg) {
-//    system.stderr.writeLine('console: ' + msg);
-//};
+page.onConsoleMessage = function (msg) {
+    system.stderr.writeLine('console: ' + msg);
+};
 
 if (searchAddress !== undefined && keyword !== undefined && zipcode !== undefined) {
     getCoordsAndExecuteMain(zipcode, main);
@@ -191,21 +192,21 @@ function setFakeCoords(coordsJson, page) {
         lat = coords.lat,
         lng = coords.lng;
 
-    window.navigator.geolocation = function (latitude, longitude) {
-        var pub = {};
-        var current_pos = {
-            coords: {
-                latitude: latitude,
-                longitude: longitude
-            }
-        };
-        pub.getCurrentPosition = function (locationCallback, errorCallback) {
-            locationCallback(current_pos);
-        };
-        return pub;
-    }(lat, lng);
-}
+    var current_pos = {
+        coords: {
+            latitude: lat,
+            longitude: lng
+        }
+    };
 
+    window.navigator.geolocation.getCurrentPosition = function (locationCallback, errorCallback) {
+        locationCallback(current_pos);
+    };
+
+    navigator.geolocation.getCurrentPosition = function (locationCallback, errorCallback) {
+        locationCallback(current_pos);
+    };
+}
 
 function main(coordsJson) {
     setFakeCoords(coordsJson, page);
@@ -215,7 +216,11 @@ function main(coordsJson) {
         }
         else {
             window.setTimeout(function () {
+                    page.render('1.png');
                     navigateToSearch(page, keyword);
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        console.log(position.coords.latitude)
+                    });
                     window.setTimeout(function () {
                             findSearchIndex(getSearchQuery(page, 1));
                             if (getMorePlacesHrefElement()) {
