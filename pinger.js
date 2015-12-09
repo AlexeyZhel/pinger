@@ -1,7 +1,7 @@
 var system = require('system'),
     webpage = require('webpage'),
     args = system.args,
-    url = 'http://www.google.com',
+    baseurl = 'https://www.google.ru/search?hl=en&q=',
     page = webpage.create(),
     requestTimeOut = 2000,
     searchDid,
@@ -46,6 +46,7 @@ for (var i = 1; i < args.length; i++) {
 //};
 
 if (searchDid !== undefined && keyword !== undefined && zipcode !== undefined) {
+    var url = baseurl + keyword;
     getCoordsAndExecuteMain(zipcode, main, url, page, requestTimeOut, keyword, searchDid);
 } else {
     usage();
@@ -230,27 +231,19 @@ function main(coordsJson, url, page, requestTimeOut, keyword, searchDid) {
         }
         else {
             window.setTimeout(function () {
-                    navigateToSearch(page, keyword);
-                    page.render('1.png');
-                    window.setTimeout(function () {
-                            page.render('2.png');
-                            checkIfOnlyOne(page, searchDid);
-                            findSearchIndex(getSearchQuery(page, 1, '_swf'), searchDid);
-                            if (getMorePlacesHrefElement(page)) {
-                                clickOnMoreHref(page);
-                                window.setTimeout(function () {
-                                        page.render('3.png');
-                                        var lastIndex = findSearchIndex(getSearchQuery(page, 1, '_FWi'), searchDid);
-                                        findOnNextPage(lastIndex, page, requestTimeOut, searchDid);
-                                    },
-                                    requestTimeOut
-                                );
-                            } else {
-                                notFoundExit();
-                            }
-                        },
-                        requestTimeOut
-                    );
+                    checkIfOnlyOne(page, searchDid);
+                    findSearchIndex(getSearchQuery(page, 1, '_swf'), searchDid);
+                    if (getMorePlacesHrefElement(page)) {
+                        clickOnMoreHref(page);
+                        window.setTimeout(function () {
+                                var lastIndex = findSearchIndex(getSearchQuery(page, 1, '_FWi'), searchDid);
+                                findOnNextPage(lastIndex, page, requestTimeOut, searchDid);
+                            },
+                            requestTimeOut
+                        );
+                    } else {
+                        notFoundExit();
+                    }
                 },
                 requestTimeOut
             );
