@@ -16,6 +16,10 @@ def get_options
       options[:output] = output
     end
 
+    opts.on("-n", "--noproxy", "Specifies output csv file.") do |p|
+      options[:noproxy] = p
+    end
+
     opts.on("-p", "--proxy_list file.txt", "Specifies file with working proxies.") do |output|
       options[:proxy] = output
     end
@@ -115,15 +119,16 @@ def replace_spaces_by_plus(keyword)
   keyword.downcase.tr(" ", "+")
 end
 
-def parse_input_csv(input, output, proxy, timeout)
+def parse_input_csv(input, output, proxy, timeout, noproxy)
   skip_title = true
-  proxy_arr = get_proxy_array proxy
+  proxy_arr = get_proxy_array proxy unless noproxy
   CSV.foreach(input) do |row|
     if skip_title
       skip_title = false
       next
     end
-    proxy_ip = proxy_arr.sample
+    proxy_str = ""
+
     biz_name = row[1]
     did = transform_did row[2]
     zip_code = row[6]
@@ -131,10 +136,14 @@ def parse_input_csv(input, output, proxy, timeout)
 
     keyword ||= "#{biz_name} #{zip_code}"
     replaced_keyword = replace_spaces_by_plus keyword
+    unless noproxy
+      proxy_ip = proxy_arr.sample
+      proxy_str = "--proxy=#{proxy_ip}"
+    end
 
-    puts "Execute: slimerjs --proxy=#{proxy_ip} pinger.js --keyword \"#{replaced_keyword}\" --search \"#{did}\" --zipcode #{zip_code} --timeout #{timeout}"
+    puts "Execute: slimerjs #{proxy_str} pinger.js --keyword \"#{replaced_keyword}\" --search \"#{did}\" --zipcode #{zip_code} --timeout #{timeout}"
 
-    stdout, stdeerr, status = Open3.capture3("slimerjs --proxy=#{proxy_ip} pinger.js --keyword \"#{replaced_keyword}\" --search \"#{did}\" --zipcode #{zip_code} --timeout #{timeout}")
+    stdout, stdeerr, status = Open3.capture3("slimerjs #{proxy_str} pinger.js --keyword \"#{replaced_keyword}\" --search \"#{did}\" --zipcode #{zip_code} --timeout #{timeout}")
     write_output_raw output, row, status, stdout, proxy_ip
   end
 end
@@ -145,9 +154,9 @@ puts options
 
 check_input_file options
 check_output_file options
-check_proxy_file options
+check_proxy_file options unless options[:noproxy]
 create_output_csv options[:output]
-parse_input_csv options[:input], options[:output], options[:proxy], options[:timeout]
+parse_input_csv options[:input], options[:output], options[:proxy], options[:timeout], options[:noproxy]
 
 
 

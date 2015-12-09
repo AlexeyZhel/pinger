@@ -10,7 +10,7 @@ var system = require('system'),
 
 page.settings.userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36";
 page.settings.javascriptEnabled = true;
-page.settings.loadImages = true;
+page.settings.loadImages = false;
 
 for (var i = 1; i < args.length; i++) {
     switch (args[i]) {
