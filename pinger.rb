@@ -16,10 +16,6 @@ def get_options
       options[:output] = output
     end
 
-    opts.on("-n", "--noproxy", "Specifies output csv file.") do |p|
-      options[:noproxy] = p
-    end
-
     opts.on("-p", "--proxy_list file.txt", "Specifies file with working proxies.") do |output|
       options[:proxy] = output
     end
@@ -119,9 +115,9 @@ def replace_spaces_by_plus(keyword)
   keyword.downcase.tr(" ", "+")
 end
 
-def parse_input_csv(input, output, proxy, timeout, noproxy)
+def parse_input_csv(input, output, proxy, timeout)
   skip_title = true
-  proxy_arr = get_proxy_array proxy unless noproxy
+  proxy_arr = get_proxy_array proxy if proxy
   CSV.foreach(input) do |row|
     if skip_title
       skip_title = false
@@ -136,7 +132,7 @@ def parse_input_csv(input, output, proxy, timeout, noproxy)
 
     keyword ||= "#{biz_name} #{zip_code}"
     replaced_keyword = replace_spaces_by_plus keyword
-    unless noproxy
+    if proxy
       proxy_ip = proxy_arr.sample
       proxy_str = "--proxy=#{proxy_ip}"
     end
@@ -154,9 +150,9 @@ puts options
 
 check_input_file options
 check_output_file options
-check_proxy_file options unless options[:noproxy]
+check_proxy_file options if options[:proxy]
 create_output_csv options[:output]
-parse_input_csv options[:input], options[:output], options[:proxy], options[:timeout], options[:noproxy]
+parse_input_csv options[:input], options[:output], options[:proxy], options[:timeout]
 
 
 
