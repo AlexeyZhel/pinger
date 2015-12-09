@@ -10,7 +10,7 @@ var system = require('system'),
 
 page.settings.userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36";
 page.settings.javascriptEnabled = true;
-page.settings.loadImages = false;
+page.settings.loadImages = true;
 
 for (var i = 1; i < args.length; i++) {
     switch (args[i]) {
@@ -46,16 +46,16 @@ for (var i = 1; i < args.length; i++) {
 //};
 
 if (searchDid !== undefined && keyword !== undefined && zipcode !== undefined) {
-    getCoordsAndExecuteMain(zipcode, main);
+    getCoordsAndExecuteMain(zipcode, main, url, page, requestTimeOut, keyword, searchDid);
 } else {
     usage();
 }
 
-function getCoordsAndExecuteMain(zipcode, mainFn) {
+function getCoordsAndExecuteMain(zipcode, mainFn, url, page, requestTimeOut, keyword) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function () {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            mainFn(xmlHttp.responseText);
+            mainFn(xmlHttp.responseText, url, page, requestTimeOut, keyword, searchDid);
     };
     xmlHttp.open("GET", "http://maps.googleapis.com/maps/api/geocode/json?address=" + zipcode, true);
     xmlHttp.send(null);
@@ -130,14 +130,14 @@ function clickOnNextPageLink(page) {
     }, clickElement);
 }
 
-function getMorePlacesHrefElement() {
+function getMorePlacesHrefElement(page) {
     var hrefEl = page.evaluate(function () {
         return document.getElementsByClassName('_wNi')[0];
     });
     return hrefEl;
 }
 
-function getNextPageHrefElement() {
+function getNextPageHrefElement(page) {
     var hrefEl = page.evaluate(function () {
         return document.getElementById('pnnext');
     });
@@ -161,7 +161,7 @@ function getSearchQuery(page, startIndex, classname) {
     return searchQuery;
 }
 
-function findSearchIndex(hash) {
+function findSearchIndex(hash, searchDid) {
     var lastIndex;
     for (var key in hash) {
         if (searchDid.test(hash[key])) {
@@ -172,12 +172,12 @@ function findSearchIndex(hash) {
     return parseInt(lastIndex);
 }
 
-function findOnNextPage(lastHashIndex) {
-    if (getNextPageHrefElement()) {
+function findOnNextPage(lastHashIndex, page, requestTimeOut, searchDid) {
+    if (getNextPageHrefElement(page)) {
         clickOnNextPageLink(page);
         window.setTimeout(function () {
-                var lastIndex = findSearchIndex(getSearchQuery(page, lastHashIndex + 1, '_FWi'));
-                findOnNextPage(lastIndex);
+                var lastIndex = findSearchIndex(getSearchQuery(page, lastHashIndex + 1, '_FWi'), searchDid);
+                findOnNextPage(lastIndex, page, requestTimeOut, searchDid);
             },
             requestTimeOut
         );
@@ -186,7 +186,7 @@ function findOnNextPage(lastHashIndex) {
     }
 }
 
-function checkIfOnlyOne(page) {
+function checkIfOnlyOne(page, searchDid) {
     var phoneEl = page.evaluate(function () {
         return phoneEl = document.getElementsByClassName('_Xbe kno-fv')[0];
     });
@@ -222,7 +222,7 @@ function setFakeCoords(coordsJson, page) {
     }
 }
 
-function main(coordsJson) {
+function main(coordsJson, url, page, requestTimeOut, keyword, searchDid) {
     setFakeCoords(coordsJson, page);
     page.open(url, function (status) {
         if (status !== 'success') {
@@ -234,14 +234,14 @@ function main(coordsJson) {
                     page.render('1.png');
                     window.setTimeout(function () {
                             page.render('2.png');
-                            checkIfOnlyOne(page);
-                            findSearchIndex(getSearchQuery(page, 1, '_swf'));
-                            if (getMorePlacesHrefElement()) {
+                            checkIfOnlyOne(page, searchDid);
+                            findSearchIndex(getSearchQuery(page, 1, '_swf'), searchDid);
+                            if (getMorePlacesHrefElement(page)) {
                                 clickOnMoreHref(page);
                                 window.setTimeout(function () {
                                         page.render('3.png');
-                                        var lastIndex = findSearchIndex(getSearchQuery(page, 1, '_FWi'));
-                                        findOnNextPage(lastIndex);
+                                        var lastIndex = findSearchIndex(getSearchQuery(page, 1, '_FWi'), searchDid);
+                                        findOnNextPage(lastIndex, page, requestTimeOut, searchDid);
                                     },
                                     requestTimeOut
                                 );
