@@ -29,7 +29,7 @@ Usage: ruby pinger.rb [options]
 
 JS script can be executed independently of ruby script:
 
-Usage: phantomjs pinger.js [options]
+Usage: slimerjs pinger.js [options]
 
      -k, --keyword        keyword as search parameter (google search string)
 
