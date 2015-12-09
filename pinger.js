@@ -12,6 +12,11 @@ page.settings.userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.3
 page.settings.javascriptEnabled = true;
 page.settings.loadImages = false;
 
+//page.viewportSize = {
+//    width: 1920,
+//    height: 1080
+//};
+
 for (var i = 1; i < args.length; i++) {
     switch (args[i]) {
         case '-k':

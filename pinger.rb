@@ -124,6 +124,7 @@ def parse_input_csv(input, output, proxy, timeout)
       next
     end
     proxy_str = ""
+    proxy_ip = ""
 
     biz_name = row[1]
     did = transform_did row[2]
@@ -134,12 +135,12 @@ def parse_input_csv(input, output, proxy, timeout)
     replaced_keyword = replace_spaces_by_plus keyword
     if proxy
       proxy_ip = proxy_arr.sample
-      proxy_str = "--proxy=#{proxy_ip}"
+      proxy_str = "--proxy=#{proxy_ip} "
     end
 
-    puts "Execute: slimerjs #{proxy_str} pinger.js --keyword \"#{replaced_keyword}\" --search \"#{did}\" --zipcode #{zip_code} --timeout #{timeout}"
-
-    stdout, stdeerr, status = Open3.capture3("slimerjs #{proxy_str} pinger.js --keyword \"#{replaced_keyword}\" --search \"#{did}\" --zipcode #{zip_code} --timeout #{timeout}")
+    puts "Execute: slimerjs #{proxy_str}pinger.js --keyword \"#{replaced_keyword}\" --search \"#{did}\" --zipcode #{zip_code} --timeout #{timeout}"
+    sleep(rand(2))
+    stdout, stdeerr, status = Open3.capture3("slimerjs #{proxy_str}pinger.js --keyword \"#{replaced_keyword}\" --search \"#{did}\" --zipcode #{zip_code} --timeout #{timeout}")
     write_output_raw output, row, status, stdout, proxy_ip
   end
 end
