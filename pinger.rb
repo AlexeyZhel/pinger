@@ -118,8 +118,6 @@ def parse_input_csv(input, output, proxy, timeout)
       skip_title = false
       next
     end
-    proxy_str = ""
-    proxy_ip = ""
 
     biz_name = row[1]
     did = transform_did row[2]
