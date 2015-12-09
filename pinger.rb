@@ -107,6 +107,9 @@ def get_proxy_array(file)
   return_arr
 end
 
+def transform_did(did)
+  "#{did[0..2]}-#{did[3..5]}-#{did[6..9]}"
+end
 
 def parse_input_csv(input, output, proxy, timeout)
   skip_title = true
@@ -118,15 +121,15 @@ def parse_input_csv(input, output, proxy, timeout)
     end
     proxy_ip = proxy_arr.sample
     biz_name = row[1]
-    did = row[2]
+    did = transform_did row[2]
     zip_code = row[6]
     keyword = row[7]
 
     keyword ||= "#{biz_name} #{zip_code}"
 
-    puts "Execute: phantomjs --proxy=#{proxy_ip} pinger.js --keyword \"#{keyword}\" --search \"#{did}\" --zipcode #{zip_code} --timeout #{timeout}"
+    puts "Execute: slimerjs --proxy=#{proxy_ip} pinger.js --keyword \"#{keyword}\" --search \"#{did}\" --zipcode #{zip_code} --timeout #{timeout}"
 
-    stdout, stdeerr, status = Open3.capture3("phantomjs --proxy=#{proxy_ip} pinger.js --keyword \"#{keyword}\" --search \"#{did}\" --zipcode #{zip_code} --timeout #{timeout}")
+    stdout, stdeerr, status = Open3.capture3("slimerjs --proxy=#{proxy_ip} pinger.js --keyword \"#{keyword}\" --search \"#{did}\" --zipcode #{zip_code} --timeout #{timeout}")
     write_output_raw output, row, status, stdout, proxy_ip
   end
 end

@@ -4,7 +4,7 @@ var system = require('system'),
     url = 'http://www.google.com',
     page = webpage.create(),
     requestTimeOut = 2000,
-    searchAddress,
+    searchDid,
     keyword,
     zipcode;
 
@@ -21,7 +21,7 @@ for (var i = 1; i < args.length; i++) {
             break;
         case '-s':
         case '--search':
-            searchAddress = new RegExp(args[i + 1]);
+            searchDid = new RegExp(args[i + 1]);
             i++;
             break;
         case '-z':
@@ -45,7 +45,7 @@ for (var i = 1; i < args.length; i++) {
 //    system.stderr.writeLine('console: ' + msg);
 //};
 
-if (searchAddress !== undefined && keyword !== undefined && zipcode !== undefined) {
+if (searchDid !== undefined && keyword !== undefined && zipcode !== undefined) {
     getCoordsAndExecuteMain(zipcode, main);
 } else {
     usage();
@@ -144,27 +144,27 @@ function getNextPageHrefElement() {
     return hrefEl;
 }
 
-function getSearchQuery(page, startIndex) {
+function getSearchQuery(page, startIndex, classname) {
     var searchQuery = evaluate(page, function () {
         var query = document.getElementsByClassName('_gt');
         var ret = {};
 
         for (var i = arguments[0]; i < (query.length + arguments[0]); i++) {
             try {
-                ret[i] = query[i - arguments[0]].getElementsByClassName('_lfe')[0].innerHTML;
+                ret[i] = query[i - arguments[0]].getElementsByClassName(arguments[1])[0].innerHTML;
             } catch (err) {
             }
         }
 
         return ret;
-    }, startIndex);
+    }, startIndex, classname);
     return searchQuery;
 }
 
 function findSearchIndex(hash) {
     var lastIndex;
     for (var key in hash) {
-        if (searchAddress.test(hash[key])) {
+        if (searchDid.test(hash[key])) {
             indexFoundExit(parseInt(key));
         }
         lastIndex = key;
@@ -176,13 +176,23 @@ function findOnNextPage(lastHashIndex) {
     if (getNextPageHrefElement()) {
         clickOnNextPageLink(page);
         window.setTimeout(function () {
-                var lastIndex = findSearchIndex(getSearchQuery(page, lastHashIndex + 1));
+                var lastIndex = findSearchIndex(getSearchQuery(page, lastHashIndex + 1, '_FWi'));
                 findOnNextPage(lastIndex);
             },
             requestTimeOut
         );
     } else {
         notFoundExit();
+    }
+}
+
+function checkIfOnlyOne(page) {
+    var phoneEl = page.evaluate(function () {
+        return phoneEl = document.getElementsByClassName('_Xbe kno-fv')[0];
+    });
+
+    if (phoneEl && searchDid.test(phoneEl.innerHTML)) {
+        indexFoundExit(1);
     }
 }
 
@@ -221,12 +231,16 @@ function main(coordsJson) {
         else {
             window.setTimeout(function () {
                     navigateToSearch(page, keyword);
+                    page.render('1.png');
                     window.setTimeout(function () {
-                            findSearchIndex(getSearchQuery(page, 1));
+                            page.render('2.png');
+                            checkIfOnlyOne(page);
+                            findSearchIndex(getSearchQuery(page, 1, '_swf'));
                             if (getMorePlacesHrefElement()) {
                                 clickOnMoreHref(page);
                                 window.setTimeout(function () {
-                                        var lastIndex = findSearchIndex(getSearchQuery(page, 1));
+                                        page.render('3.png');
+                                        var lastIndex = findSearchIndex(getSearchQuery(page, 1, '_FWi'));
                                         findOnNextPage(lastIndex);
                                     },
                                     requestTimeOut
