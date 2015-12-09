@@ -41,9 +41,9 @@ for (var i = 1; i < args.length; i++) {
     }
 }
 // test func for evaluate
-page.onConsoleMessage = function (msg) {
-    system.stderr.writeLine('console: ' + msg);
-};
+//page.onConsoleMessage = function (msg) {
+//    system.stderr.writeLine('console: ' + msg);
+//};
 
 if (searchAddress !== undefined && keyword !== undefined && zipcode !== undefined) {
     getCoordsAndExecuteMain(zipcode, main);
@@ -199,13 +199,17 @@ function setFakeCoords(coordsJson, page) {
         }
     };
 
-    window.navigator.geolocation.getCurrentPosition = function (locationCallback, errorCallback) {
-        locationCallback(current_pos);
-    };
+    if (window.navigator.geolocation) {
+        window.navigator.geolocation.getCurrentPosition = function (locationCallback, errorCallback) {
+            locationCallback(current_pos);
+        };
+    }
 
-    navigator.geolocation.getCurrentPosition = function (locationCallback, errorCallback) {
-        locationCallback(current_pos);
-    };
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition = function (locationCallback, errorCallback) {
+            locationCallback(current_pos);
+        };
+    }
 }
 
 function main(coordsJson) {
@@ -216,11 +220,7 @@ function main(coordsJson) {
         }
         else {
             window.setTimeout(function () {
-                    page.render('1.png');
                     navigateToSearch(page, keyword);
-                    navigator.geolocation.getCurrentPosition(function(position) {
-                        console.log(position.coords.latitude)
-                    });
                     window.setTimeout(function () {
                             findSearchIndex(getSearchQuery(page, 1));
                             if (getMorePlacesHrefElement()) {

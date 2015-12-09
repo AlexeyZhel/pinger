@@ -80,7 +80,7 @@ end
 
 def create_output_csv(file)
   CSV.open(file, "wb") do |csv|
-    csv << ["fg_id", "DID", "business name", "street", "city", "state", "zipcode", "result", "rank", "ip address", "mac address"]
+    csv << ["fg_id", "business name", "DID" , "street", "city", "state", "zipcode", "result", "rank", "ip address"]
   end
 end
 
@@ -117,8 +117,8 @@ def parse_input_csv(input, output, proxy, timeout)
       next
     end
     proxy_ip = proxy_arr.sample
-    did = row[1]
-    biz_name = row[2]
+    biz_name = row[1]
+    did = row[2]
     zip_code = row[6]
     keyword = row[7]
 
