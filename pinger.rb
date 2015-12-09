@@ -54,13 +54,8 @@ def check_input_file(opts)
   end
 end
 
-def check_proxy_file(opts)
-  if opts[:proxy].nil?
-    puts "Proxy list file is not specified"
-    exit 1
-  end
-
-  unless File.exist?(opts[:proxy])
+def check_proxy_file(proxy)
+  unless File.exist?(proxy)
     puts "Please specify existed proxy list file"
     exit 1
   end
@@ -151,7 +146,7 @@ puts options
 
 check_input_file options
 check_output_file options
-check_proxy_file options if options[:proxy]
+check_proxy_file options[:proxy] if options[:proxy]
 create_output_csv options[:output]
 parse_input_csv options[:input], options[:output], options[:proxy], options[:timeout]
 
