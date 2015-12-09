@@ -4,7 +4,7 @@ Requirements:
 
 Ruby 2.0.0 or higher 
 
-Phantomjs 2.0.0 or higher (this is important, because phantomjs 1.9.X does not work correctly with google fonts by some reasons)
+SlimerJS 0.9.6
 
 IMPORTANT:
 
